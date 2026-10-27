@@ -1,0 +1,93 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AuctionStatus {
+  ACTIVE
+  CLOSED
+  DESERTED
+  CANCELLED
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String
+  passwordHash     String
+  role             Role      @default(USER)
+  refreshTokenHash String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  auctions         Auction[] @relation("SellerAuctions")
+  wonAuctions      Auction[] @relation("WinnerAuctions")
+  bids             Bid[]
+
+  @@map("users")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auctions    Auction[]
+
+  @@map("categories")
+}
+
+model Auction {
+  id                 String        @id @default(uuid())
+  title              String
+  description        String
+  imageUrl           String?
+  startingPrice      Float
+  currentPrice       Float
+  minIncrement       Float
+  status             AuctionStatus @default(ACTIVE)
+  cancellationReason String?
+  startsAt           DateTime      @default(now())
+  endsAt             DateTime
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  sellerId           String
+  seller             User          @relation("SellerAuctions", fields: [sellerId], references: [id])
+
+  winnerId           String?
+  winner             User?         @relation("WinnerAuctions", fields: [winnerId], references: [id])
+
+  categoryId         String
+  category           Category      @relation(fields: [categoryId], references: [id])
+
+  bids               Bid[]
+
+  @@map("auctions")
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  amount    Float
+  createdAt DateTime @default(now())
+
+  auctionId String
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  bidderId  String
+  bidder    User     @relation(fields: [bidderId], references: [id])
+
+  @@map("bids")
+}

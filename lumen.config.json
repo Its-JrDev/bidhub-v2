@@ -1,0 +1,66 @@
+{
+  "$schema": "https://lumen-sh.github.io/create-lumen/schema/lumen.config.v2.json",
+  "manifestVersion": 2,
+  "framework": {
+    "name": "next",
+    "variant": "app-router"
+  },
+  "styling": {
+    "engine": "tailwind"
+  },
+  "architecture": {
+    "preset": "feature-based",
+    "type": "feature-based",
+    "validation": "strict"
+  },
+  "harness": {
+    "commands": [
+      {
+        "name": "lint",
+        "command": "eslint .",
+        "required": true
+      },
+      {
+        "name": "format",
+        "command": "prettier --check .",
+        "required": true
+      },
+      {
+        "name": "types",
+        "command": "tsc -b",
+        "required": true
+      },
+      {
+        "name": "build",
+        "command": "npm run build",
+        "required": true
+      }
+    ]
+  },
+  "ui": {
+    "kit": "shadcn"
+  },
+  "docs": {
+    "language": "en"
+  },
+  "paths": {
+    "features": "src/features",
+    "components": "src/shared/components",
+    "services": "src/shared/services",
+    "hooks": "src/shared/hooks",
+    "pages": "src/app",
+    "ui": "src/shared/components/ui"
+  },
+  "tooling": {
+    "language": "ts",
+    "linter": "eslint",
+    "formatter": "prettier"
+  },
+  "database": {
+    "orm": "prisma",
+    "provider": "supabase"
+  },
+  "docker": true,
+  "routeGroups": true,
+  "agentDocs": true
+}
